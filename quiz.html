@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>고급 화학 — 개념·문제 학습</title>
+<style>
+  :root{
+    --bg1:#0f2027; --bg2:#203a43; --bg3:#2c5364;
+    --card:#ffffff; --ink:#1b2733; --sub:#5b6b7b;
+    --brand:#2c7be5; --brand-d:#1a5fc4;
+    --ok:#1aae6f; --ok-bg:#e6f7f0;
+    --bad:#e5484d; --bad-bg:#fdecec;
+    --line:#e6ebf1; --concept:#f4f8ff; --conceptline:#cfe0fb;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+    color:var(--ink); display:flex; flex-direction:column; min-height:100vh;
+    overflow-x:hidden;
+  }
+  sub,sup{font-size:.72em;}
+  header{padding:14px 18px 8px;color:#eaf2ff;flex-shrink:0;}
+  .titlerow{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+  .titlerow h1{font-size:17px;margin:0;font-weight:800;letter-spacing:-.3px;}
+  .score{font-size:13px;font-weight:700;background:rgba(255,255,255,.15);
+    padding:4px 11px;border-radius:999px;white-space:nowrap;}
+  .progwrap{margin-top:10px;}
+  .progmeta{display:flex;justify-content:space-between;font-size:11.5px;color:#bcd2ee;margin-bottom:5px;}
+  .progbar{height:7px;background:rgba(255,255,255,.18);border-radius:999px;overflow:hidden;}
+  .progfill{height:100%;width:0;background:linear-gradient(90deg,#69f0ae,#2c7be5);
+    border-radius:999px;transition:width .35s ease;}
+  main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:14px 14px 90px;}
+  .card{
+    background:var(--card);border-radius:20px;width:100%;max-width:680px;
+    box-shadow:0 18px 50px rgba(0,0,0,.28);padding:22px 22px 26px;
+    animation:pop .32s cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.985);}to{opacity:1;transform:none;}}
+  .badge{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.3px;
+    color:var(--brand-d);background:#eaf2fe;padding:4px 10px;border-radius:999px;}
+  .badge.s2{color:#9a6a00;background:#fff3d6;}
+  .badge.s3{color:#1f7a52;background:#e0f6ec;}
+  .ctag{font-size:12px;color:var(--sub);font-weight:700;margin-left:8px;}
+  /* concept */
+  .concept{background:var(--concept);border:1.5px solid var(--conceptline);
+    border-radius:16px;padding:18px 18px 16px;margin-top:14px;}
+  .concept h2{margin:0 0 8px;font-size:15px;color:var(--brand-d);display:flex;align-items:center;gap:7px;}
+  .concept .body{font-size:15px;line-height:1.65;color:var(--ink);}
+  .concept .body b{color:var(--brand-d);}
+  .concept ul{margin:8px 0 0;padding-left:18px;}
+  .concept li{margin:4px 0;line-height:1.55;}
+  .tbref{margin-top:12px;background:#fff8ec;border:1.5px solid #f0d9a6;border-left:5px solid #e8a93c;
+    border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.55;color:#5c4316;}
+  .tbref .tt{display:block;font-weight:800;color:#9a6a00;margin-bottom:3px;}
+  .tbref b{color:#8a5a00;}
+  .qhint{margin-top:18px;font-size:13px;color:var(--sub);text-align:center;}
+  /* question */
+  .qhead{margin-top:14px;font-size:16.5px;line-height:1.62;font-weight:700;color:#11202e;
+    background:#eef3f9;border:1.5px solid #d3deea;border-left:5px solid var(--brand);
+    border-radius:12px;padding:15px 16px;}
+  .qhead .qmark{display:inline-block;font-size:12px;font-weight:800;color:var(--brand-d);
+    background:#dceafc;padding:2px 9px;border-radius:999px;margin-bottom:8px;}
+  .qsub{font-size:13.5px;color:var(--sub);font-weight:500;margin-top:6px;line-height:1.55;
+    background:#f7f9fc;border-radius:10px;padding:10px 12px;}
+  .opts{margin-top:16px;display:flex;flex-direction:column;gap:10px;}
+  .opt{display:flex;align-items:center;gap:12px;border:1.7px solid var(--line);
+    border-radius:13px;padding:13px 14px;font-size:15.5px;cursor:pointer;
+    background:#fff;transition:.15s;user-select:none;}
+  .opt:active{transform:scale(.99);}
+  .opt .lbl{width:26px;height:26px;flex-shrink:0;border-radius:50%;background:#eef2f7;
+    color:var(--sub);font-weight:800;font-size:13.5px;display:flex;align-items:center;justify-content:center;}
+  .opt.correct{border-color:var(--ok);background:var(--ok-bg);}
+  .opt.correct .lbl{background:var(--ok);color:#fff;}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-bg);}
+  .opt.wrong .lbl{background:var(--bad);color:#fff;}
+  .opt.dim{opacity:.5;}
+  .feedback{margin-top:16px;border-radius:14px;padding:15px 16px;font-size:14.5px;line-height:1.62;display:none;}
+  .feedback.show{display:block;animation:pop .25s ease;}
+  .feedback.ok{background:var(--ok-bg);border:1.5px solid #aee7cd;}
+  .feedback.bad{background:var(--bad-bg);border:1.5px solid #f6c4c5;}
+  .feedback .fh{font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:7px;}
+  .feedback.ok .fh{color:#137a4f;}
+  .feedback.bad .fh{color:#c1373b;}
+  .feedback b{color:inherit;}
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    border:none;border-radius:14px;font-size:16px;font-weight:800;padding:15px 20px;
+    cursor:pointer;width:100%;margin-top:18px;transition:.15s;}
+  .btn.primary{background:var(--brand);color:#fff;box-shadow:0 8px 20px rgba(44,123,229,.35);}
+  .btn.primary:active{transform:translateY(1px);}
+  .btn.ghost{background:#eef2f7;color:var(--sub);box-shadow:none;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  /* footer nav */
+  .nav{position:fixed;bottom:0;left:0;right:0;display:flex;gap:10px;justify-content:center;
+    padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+    background:linear-gradient(0deg,rgba(15,32,39,.96),rgba(15,32,39,0));}
+  .navbtn{flex:1;max-width:200px;background:rgba(255,255,255,.14);color:#eaf2ff;border:none;
+    border-radius:13px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;
+    backdrop-filter:blur(6px);transition:.15s;}
+  .navbtn:active{transform:scale(.98);}
+  .navbtn:disabled{opacity:.35;}
+  .navbtn.dot{flex:0 0 auto;max-width:none;padding:13px 16px;}
+  /* result */
+  .result{text-align:center;}
+  .result .big{font-size:54px;font-weight:900;color:var(--brand);line-height:1.1;margin:6px 0;}
+  .result .ring{font-size:14px;color:var(--sub);}
+  .reviewlist{margin-top:18px;text-align:left;display:flex;flex-direction:column;gap:9px;}
+  .reviewitem{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;
+    display:flex;align-items:center;gap:10px;font-size:14.5px;transition:.15s;}
+  .reviewitem:active{background:#f7f9fc;}
+  .reviewitem .num{width:30px;height:30px;flex-shrink:0;border-radius:8px;background:var(--bad-bg);
+    color:var(--bad);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px;}
+  .perfect{background:var(--ok-bg);border:1.5px solid #aee7cd;border-radius:14px;
+    padding:16px;color:#137a4f;font-weight:700;margin-top:16px;}
+  .swipehint{color:#9fb6cf;font-size:11.5px;text-align:center;margin-top:6px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="titlerow">
+    <h1>고급 화학 · 정기시험 대비</h1>
+    <div class="score" id="score">맞힘 0 / 24</div>
+  </div>
+  <div class="progwrap">
+    <div class="progmeta"><span id="progtext">개념 학습</span><span id="progcount">1 / 24</span></div>
+    <div class="progbar"><div class="progfill" id="progfill"></div></div>
+  </div>
+</header>
+
+<main><div id="stage"></div></main>
+
+<div class="nav">
+  <button class="navbtn" id="prevBtn">◀ 이전</button>
+  <button class="navbtn" id="nextBtn">다음 ▶</button>
+</div>
+
+<script>
+/* ===== 데이터: 원본 연습문항을 변형해 24문항 전부 선택형으로 재구성 ===== */
+const DATA = [
+ // ---------- 선택형 ----------
+ {sec:1, area:"원자 구조·오비탈",
+  concept:`주 양자수 <b>n</b> 껍질의 오비탈 총수는 <b>n²개</b>입니다.
+   <ul><li>n=4 → 4s(1) + 4p(3) + 4d(5) + 4f(7)</li>
+   <li>오비탈 1개에 전자 2개 → 전자 최대 <b>2n²개</b></li></ul>`,
+  q:`바닥 상태 수소 원자에서 주 양자수 n=4인 껍질에 들어 있는 오비탈의 총 개수는?`,
+  opts:["4개","9개","12개","16개","25개"], ans:3,
+  sol:`n² = 4² = <b>16개</b>. 4s(1)+4p(3)+4d(5)+4f(7) = 16. (16은 오비탈 수, 전자 수는 32개와 혼동하지 않기)`},
+
+ {sec:1, area:"화학 결합·옥텟",
+  concept:`옥텟 규칙의 예외 두 가지를 기억하세요.
+   <ul><li><b>전자 결핍</b>: Be(4개), B(6개)</li>
+   <li><b>확장 옥텟</b>: 3주기 이상 중심 원자(SF₆의 S = 12개)</li></ul>`,
+  q:`중심 원자가 옥텟 규칙을 만족하지 <b>못한</b> 것만 모두 고른 것은?<br>ㄱ. CO₂  ㄴ. BeCl₂  ㄷ. SF₆  ㄹ. NCl₃  ㅁ. H₂O`,
+  opts:["ㄱ, ㄴ","ㄴ, ㄷ","ㄴ, ㅁ","ㄷ, ㄹ","ㄹ, ㅁ"], ans:1,
+  sol:`BeCl₂의 Be은 전자 4개로 <b>옥텟 미달</b>, SF₆의 S은 전자 12개로 <b>확장 옥텟</b>. CO₂·NCl₃·H₂O 중심 원자는 옥텟 만족.`},
+
+ {sec:1, area:"유효숫자",
+  concept:`유효숫자 규칙.
+   <ul><li>앞쪽 0은 자리 표시 → <b>무효</b></li>
+   <li>유효숫자 사이의 0, 소수점 뒤 끝의 0 → <b>유효</b></li></ul>`,
+  q:`측정값 0.00410과 35.0의 유효숫자 개수를 옳게 짝지은 것은?`,
+  opts:["2, 2","2, 3","3, 2","3, 3","5, 3"], ans:3,
+  sol:`0.00410 → 4·1·끝0 = <b>3개</b> (앞 0들은 무효, 끝 0은 유효). 35.0 → 3·5·0 = <b>3개</b>.`},
+
+ {sec:1, area:"이상 기체 방정식",
+  concept:`<b>PV = nRT</b> — 온도는 반드시 절대온도(K).
+   <ul><li>K = ℃ + 273</li><li>R = 0.082 atm·L/(K·mol)</li></ul>`,
+  q:`27℃, 2.0 atm에서 이상 기체의 부피가 8.2 L일 때, 기체의 양(mol)에 가장 가까운 값은?`,
+  opts:["0.33","0.50","0.67","1.0","1.5"], ans:2,
+  sol:`T = 300 K. n = PV/RT = (2.0×8.2)/(0.082×300) = 16.4/24.6 ≒ <b>0.67 mol</b>. ℃를 그대로 넣지 않도록 주의.`},
+
+ {sec:1, area:"분압·돌턴 법칙",
+  concept:`<b>분압 = 전체 압력 × 몰분율</b> (돌턴의 분압 법칙).`,
+  q:`혼합 기체의 전체 압력이 2.0 atm이고 기체 B의 몰분율이 0.25일 때, B의 분압(atm)은?`,
+  opts:["0.25","0.40","0.50","0.75","1.0"], ans:2,
+  sol:`2.0 × 0.25 = <b>0.50 atm</b>.`},
+
+ {sec:1, area:"증기 압력·끓는점",
+  concept:`끓음 = 증기 압력이 외부 압력과 같아지는 순간.
+   <ul><li>외부 압력↓ → 끓는점↓</li>
+   <li>분자 간 인력↑ → 증기압↓ → 끓는점<b>↑</b></li></ul>`,
+  q:`증기 압력 곡선에 대한 설명으로 옳은 것만 모두 고른 것은?<br>ㄱ. 외부 압력이 낮아지면 끓는점도 낮아진다.<br>ㄴ. 액체는 증기압이 외부 압력과 같아지는 온도에서 끓는다.<br>ㄷ. 분자 사이 인력이 강할수록 끓는점이 낮다.`,
+  opts:["ㄱ","ㄷ","ㄱ, ㄴ","ㄴ, ㄷ","ㄱ, ㄴ, ㄷ"], ans:2,
+  sol:`ㄱ·ㄴ 옳음. ㄷ는 인력이 강하면 끓는점이 <b>높아지므로</b> 틀림 → 정답 ㄱ, ㄴ.`},
+
+ {sec:1, area:"결정 구조·배위수",
+  concept:`배위수(최근접 이웃 원자 수): 단순입방 6, <b>체심입방(BCC) 8</b>, 면심입방(FCC) 12.`,
+  q:`체심 입방(BCC) 구조에서 한 원자의 배위수는?`,
+  opts:["4","6","8","12","14"], ans:2,
+  sol:`BCC의 체심 원자는 꼭짓점 8개 원자와 최근접 → <b>배위수 8</b>.`},
+
+ {sec:1, area:"헤스 법칙",
+  concept:`반응식을 조합할 때 <b>계수를 곱하면 ΔH도 같은 배수</b>, 뒤집으면 부호 반전.`,
+  q:`ⓐ S + O₂ → SO₂ (ΔH₁ = −297 kJ), ⓑ 2SO₂ + O₂ → 2SO₃ (ΔH₂ = −198 kJ)일 때, ⓒ S + 3/2 O₂ → SO₃의 ΔH는?`,
+  opts:["−495","−396","−297","−99","+396"], ans:1,
+  sol:`ⓒ = ⓐ + ½ⓑ → ΔH = −297 + ½(−198) = −297 − 99 = <b>−396 kJ</b>.`},
+
+ {sec:1, area:"자유 에너지·자발성",
+  concept:`<b>ΔG = ΔH − TΔS</b>. 항상 자발: ΔH&lt;0, ΔS&gt;0 / 항상 비자발: ΔH&gt;0, ΔS&lt;0.`,
+  q:`모든 온도에서 항상 <b>비자발적</b>인 경우는?`,
+  opts:["ΔH<0, ΔS>0","ΔH<0, ΔS<0","ΔH>0, ΔS>0","ΔH>0, ΔS<0","ΔH=0, ΔS=0"], ans:3,
+  sol:`ΔH&gt;0, ΔS&lt;0이면 ΔG = ΔH − TΔS &gt; 0이 모든 온도에서 성립 → <b>항상 비자발적</b>.`},
+
+ {sec:1, area:"브뢴스테드–로리 산·염기",
+  concept:`산 = H⁺ 줌, 염기 = H⁺ 받음. 짝산/짝염기는 H⁺ <b>하나 차이</b>.`,
+  q:`HCO₃⁻ + H₂O ⇌ H₂CO₃ + OH⁻에서 HCO₃⁻의 짝산은?`,
+  opts:["H₂O","OH⁻","CO₃²⁻","H₂CO₃","H₃O⁺"], ans:3,
+  sol:`HCO₃⁻가 H⁺를 받는 염기로 작용 → H⁺를 얻은 <b>H₂CO₃</b>가 짝산. (CO₃²⁻는 HCO₃⁻가 산일 때의 짝염기)`},
+
+ {sec:1, area:"전기화학·표준 전위",
+  concept:`<b>E°전지 = E°(환원극) − E°(산화극)</b>. E°가 클수록 환원이 잘 됨.`,
+  q:`Cu²⁺ + Zn → Cu + Zn²⁺의 E°전지는? (Cu²⁺/Cu = +0.34 V, Zn²⁺/Zn = −0.76 V)`,
+  opts:["−1.10","−0.42","+0.42","+1.10","+1.44"], ans:3,
+  sol:`E° = (+0.34) − (−0.76) = <b>+1.10 V</b>.`},
+
+ {sec:1, area:"산화·환원·산화제",
+  concept:`<b>산화제 = 환원되는(산화수↓) 물질</b>, 환원제 = 산화되는(산화수↑) 물질.`,
+  q:`Cr₂O₇²⁻ + Fe²⁺ + H⁺ → Cr³⁺ + Fe³⁺ + H₂O에서 산화제는?`,
+  opts:["Cr₂O₇²⁻","Fe²⁺","H⁺","Cr³⁺","Fe³⁺"], ans:0,
+  sol:`Cr: +6 → +3 (환원됨) → <b>Cr₂O₇²⁻가 산화제</b>. Fe²⁺(+2→+3)는 환원제.`},
+
+ // ---------- 서술형 → 선택형 변형 ----------
+ {sec:2, area:"분자 오비탈·결합 차수",
+  concept:`<b>결합 차수 = (결합성 − 반결합성 전자)/2</b>. O₂ 원자가 전자 12개, 배치는 …π₂ₚ⁴ π*₂ₚ².`,
+  q:`O₂⁺(O₂에서 π* 전자 1개 제거)의 결합 차수는?`,
+  opts:["1","1.5","2","2.5","3"], ans:3,
+  sol:`O₂⁺는 결합성 8, 반결합성 3 → (8 − 3)/2 = <b>2.5</b>. (결합 차수↑ → 결합 짧고 강함)`},
+
+ {sec:2, area:"착물·결정장 이론",
+  concept:`Fe²⁺ = d⁶. 강한 장(CN⁻) → Δ₀ 큼 → <b>저스핀</b>(전자 짝지음). 약한 장(H₂O) → 고스핀.`,
+  q:`반자성인 [Fe(CN)₆]⁴⁻의 d 전자 배치로 옳은 것은?`,
+  opts:["t₂g⁴ e_g²","t₂g⁶ e_g⁰","t₂g³ e_g³","t₂g⁵ e_g¹","t₂g² e_g⁴"], ans:1,
+  sol:`CN⁻는 강한 장 → Δ₀ &gt; 짝지음 에너지 → 전자 6개가 모두 t₂g에 들어감 → <b>t₂g⁶ e_g⁰</b>, 홀전자 0 → 반자성.`},
+
+ {sec:2, area:"유효숫자·이상 기체",
+  concept:`PV = nRT (T = ℃ + 273). 풀이 과정과 단위를 함께 점검.`,
+  q:`127℃, 1.5 atm에서 이상 기체 8.2 L의 양(mol)은? (R = 0.082)`,
+  opts:["0.25","0.30","0.375","0.50","0.75"], ans:2,
+  sol:`T = 400 K. n = (1.5×8.2)/(0.082×400) = 12.3/32.8 = <b>0.375 mol</b>.`},
+
+ {sec:2, area:"자유 에너지·평형 상수",
+  concept:`평형에서 ΔG = 0, Q = K → <b>ΔG° = −RT ln K</b> (R = 8.314 J/(K·mol)).`,
+  q:`298 K, K = 8.8 (ln8.8 ≒ 2.2)일 때 표준 자유 에너지 변화 ΔG°는?`,
+  opts:["−5.5 kJ/mol","−10.9 kJ/mol","+5.5 kJ/mol","−2.2 kJ/mol","−57.2 kJ/mol"], ans:0,
+  sol:`ΔG° = −RT ln K = −8.314×298×2.2 ≒ −5451 J/mol ≒ <b>−5.5 kJ/mol</b>. (J↔kJ 환산 주의)`},
+
+ {sec:2, area:"짝산–짝염기 쌍",
+  concept:`한 반응에는 짝산–짝염기 쌍이 <b>두 쌍</b> 존재. 각 쌍은 H⁺ 하나 차이.`,
+  q:`CH₃COOH + NH₃ ⇌ CH₃COO⁻ + NH₄⁺에서 짝산–짝염기 쌍으로 옳은 것은?`,
+  opts:["CH₃COOH와 NH₄⁺","CH₃COOH와 CH₃COO⁻","NH₃와 CH₃COO⁻","CH₃COOH와 NH₃","CH₃COO⁻와 NH₄⁺"], ans:1,
+  sol:`산 CH₃COOH ↔ 짝염기 CH₃COO⁻, 염기 NH₃ ↔ 짝산 NH₄⁺. 따라서 한 쌍은 <b>CH₃COOH / CH₃COO⁻</b>.`},
+
+ {sec:2, area:"네른스트 식",
+  concept:`<b>E = E° − (0.0592/n) log Q</b> (25℃). Q&lt;1이면 E&gt;E°.`,
+  q:`Pb²⁺/Pb(−0.13 V), Sn/Sn²⁺(−0.14 V) 전지에서 [Pb²⁺]=0.40, [Sn²⁺]=0.10일 때 E전지는? (log2≒0.30)`,
+  opts:["+0.01 V","+0.028 V","+0.05 V","−0.01 V","+0.10 V"], ans:1,
+  sol:`E° = (−0.13)−(−0.14) = +0.01 V. Q = 0.10/0.40 = ¼, log Q = −2log2 = −0.60. E = 0.01 − (0.0592/2)(−0.60) ≒ <b>+0.028 V</b>.`},
+
+ {sec:2, area:"혼성·분자 극성",
+  concept:`전자 영역 수 → 혼성(sp/sp²/sp³). 결합이 극성이어도 <b>대칭이면 무극성</b>.`,
+  q:`다음 중 <b>무극성</b> 분자(이온)만 모두 고른 것은?<br>ㄱ. PCl₃  ㄴ. NH₄⁺  ㄷ. CO₂`,
+  opts:["ㄱ","ㄷ","ㄱ, ㄴ","ㄴ, ㄷ","ㄱ, ㄴ, ㄷ"], ans:3,
+  sol:`PCl₃(sp³, 삼각뿔)는 비대칭 → 극성. NH₄⁺(정사면체)·CO₂(직선)는 대칭 → <b>무극성</b> → ㄴ, ㄷ.`},
+
+ // ---------- 보강 ----------
+ {sec:3, area:"오비탈 개수",
+  concept:`부양자수 <b>l</b> 오비탈은 m_l = −l … +l → <b>(2l+1)개</b>. (s=1, p=3, d=5, f=7)`,
+  q:`n=2, l=1에 해당하는 오비탈의 개수는?`,
+  opts:["1개","3개","5개","7개","9개"], ans:1,
+  sol:`l=1은 2p, m_l = −1, 0, +1 → <b>3개</b>.`},
+
+ {sec:3, area:"분자 간 힘",
+  concept:`<b>수소 결합</b>(F·O·N–H)은 분산력·쌍극자력보다 훨씬 강함.`,
+  q:`H₂O(끓는점 100℃)가 분자량이 더 큰 H₂S(−60℃)보다 끓는점이 훨씬 높은 주된 이유는?`,
+  opts:["H₂O의 분자량이 더 커서","H₂O 분자 사이의 수소 결합","H₂S의 이온 결합 때문","H₂O의 분산력이 더 약해서","H₂S의 공유 결합이 더 강해서"], ans:1,
+  sol:`O–H가 형성하는 <b>수소 결합</b>이 분산력 위주의 H₂S보다 훨씬 강해, 분자량이 작아도 끓는점이 크게 높다.`},
+
+ {sec:3, area:"pH 계산",
+  concept:`강산은 완전 이온화. <b>pH = −log[H⁺]</b>.`,
+  q:`25℃에서 0.0010 M HCl 수용액의 pH는? (완전 이온화 가정)`,
+  opts:["1","2","3","4","11"], ans:2,
+  sol:`[H⁺] = 1.0×10⁻³ M → pH = −log(10⁻³) = <b>3</b>.`},
+
+ {sec:3, area:"전기 분해·패러데이",
+  concept:`<b>Q = It</b>, 전자 몰수 = Q/F (F = 9.65×10⁴ C/mol).`,
+  q:`Ag⁺ 수용액을 2.0 A로 965초 전기 분해할 때 석출되는 Ag(mol)은?`,
+  opts:["0.005","0.01","0.02","0.04","0.08"], ans:2,
+  sol:`Q = 2.0×965 = 1930 C. 전자 = 1930/96500 = 0.02 mol. Ag⁺ + e⁻ → Ag (1:1) → <b>0.02 mol</b>.`},
+
+ {sec:3, area:"분광화학 계열",
+  concept:`분광화학 계열 <b>CN⁻ &gt; NH₃ &gt; H₂O &gt; F⁻</b>: 앞일수록 강한 장 → Δ₀ 큼.`,
+  q:`같은 금속의 정팔면체 착이온에서 결정장 갈라짐 에너지(Δ₀)가 가장 큰 리간드는?`,
+  opts:["CN⁻","NH₃","H₂O","F⁻","모두 같다"], ans:0,
+  sol:`계열에서 가장 앞 = 가장 강한 장 → <b>CN⁻</b>가 Δ₀ 최대.`}
+];
+
+/* 교과서에서 더 찾아보기 — 각 문항 개념의 교과서(2026 1학기 고급화학, Ⅰ~Ⅴ) 수록 위치(인쇄면 쪽수) */
+const REFS=[
+ 'Ⅰ-1 「원자 오비탈의 모양과 에너지」 <b>17~19쪽</b> (양자수·오비탈 수: 표 Ⅰ-1, 19쪽)',
+ 'Ⅰ-2 「화학 결합 — 루이스 구조」 <b>24~26쪽</b>',
+ 'Ⅱ-1 「유효숫자와 과학 표기법」 <b>64~67쪽</b>',
+ 'Ⅱ-2 「기체 — 이상 기체 상태 방정식」 <b>82~84쪽</b>',
+ 'Ⅱ-2 「실제 기체와 혼합 기체(분압·몰분율)」 <b>82~84쪽</b>',
+ 'Ⅱ-3 「액체의 증발과 증기압 · 액체의 끓는점」 <b>85~89쪽</b>',
+ 'Ⅱ-4 「고체 결정의 종류(단위 세포·배위수)」 <b>96~98쪽</b>',
+ 'Ⅲ-1 「엔탈피 — 헤스 법칙」 <b>125~126쪽</b>',
+ 'Ⅲ-2 「깁스 자유 에너지와 반응의 자발성」 <b>136~140쪽</b>',
+ 'Ⅳ-2 「산 염기의 정의(브뢴스테드-로리)」 <b>161~163쪽</b>',
+ 'Ⅴ-2 「전지 전위(표준 환원 전위)」 <b>186~190쪽</b>',
+ 'Ⅴ-1 「산화제와 환원제(산화수)」 <b>180~182쪽</b>',
+ 'Ⅰ-3 「분자 오비탈과 에너지(결합 차수·상자성)」 <b>39~41쪽</b>',
+ 'Ⅰ-3 「전이 금속과 배위 화합물(결정장 이론)」 <b>42~44쪽</b>',
+ 'Ⅱ-1 「유효숫자」 <b>64쪽</b> · Ⅱ-2 「기체」 <b>82~84쪽</b>',
+ 'Ⅴ-2 「전지 전위 — 자유 에너지와 평형 상수(ΔG°=−RTlnK)」 <b>189쪽</b> · Ⅲ-2 「깁스 자유 에너지」 <b>140쪽</b>',
+ 'Ⅳ-2 「산 염기의 정의(짝산·짝염기)」 <b>161~163쪽</b>',
+ 'Ⅴ-2 「전지 전위 — 네른스트 식」 <b>189~190쪽</b>',
+ 'Ⅰ-3 「원자가 결합(혼성 오비탈)」 <b>37~38쪽</b> · 분자의 극성 <b>29~31쪽</b>',
+ 'Ⅰ-1 「원자 오비탈의 모양과 에너지」 <b>17~19쪽</b> (표 Ⅰ-1, 19쪽)',
+ 'Ⅱ-3 「물의 분자 구조와 특성(수소 결합·분자 간 힘)」 <b>91~93쪽</b>',
+ 'Ⅳ-2 「산과 염기의 세기(pH)」 <b>164~168쪽</b>',
+ 'Ⅴ-3 「전기 분해와 전해 전지(패러데이)」 <b>194~196쪽</b>',
+ 'Ⅰ-3 「전이 금속과 배위 화합물(분광 화학적 계열)」 <b>42~44쪽</b>'
+];
+const LABELS=["①","②","③","④","⑤"];
+const SECNAME={1:"선택형",2:"서술형 변형",3:"보강"};
+const SECCLASS={1:"",2:"s2",3:"s3"};
+
+/* ===== 상태 ===== */
+let idx=0;                         // 현재 문항
+let phase="concept";               // concept | question | result
+const state=DATA.map(()=>({locked:false, firstWrong:false, picked:null}));
+
+const $=id=>document.getElementById(id);
+const stage=$("stage");
+
+function correctCount(){return state.filter(s=>s.locked&&!s.firstWrong).length;}
+function wrongItems(){return state.map((s,i)=>({s,i})).filter(o=>o.s.firstWrong);}
+
+function updateChrome(){
+  const total=DATA.length;
+  if(phase==="result"){
+    $("progtext").textContent="학습 완료";
+    $("progcount").textContent=`${total} / ${total}`;
+    $("progfill").style.width="100%";
+  }else{
+    $("progtext").textContent = phase==="concept" ? "개념 학습" : "문제 풀이";
+    $("progcount").textContent=`${idx+1} / ${total}`;
+    const done = idx + (phase==="question"?0.5:0);
+    $("progfill").style.width = `${(done/total)*100}%`;
+  }
+  $("score").textContent=`맞힘 ${correctCount()} / ${total}`;
+  $("prevBtn").disabled = (phase!=="result" && idx===0 && phase==="concept");
+  // next 버튼 라벨
+  const nb=$("nextBtn");
+  if(phase==="result"){ nb.textContent="처음으로 ↺"; $("prevBtn").style.visibility="hidden"; }
+  else { $("prevBtn").style.visibility="visible";
+    nb.textContent = phase==="concept" ? "문제 풀기 ▶" : (state[idx].locked ? (idx===DATA.length-1?"결과 보기 ▶":"다음 개념 ▶") : "정답 선택 필요");
+    nb.disabled = (phase==="question" && !state[idx].locked);
+  }
+}
+
+function render(){
+  if(phase==="result"){ renderResult(); updateChrome(); return; }
+  const d=DATA[idx], st=state[idx];
+  let h=`<span class="badge ${SECCLASS[d.sec]}">${SECNAME[d.sec]} · ${idx+1}번</span><span class="ctag">${d.area}</span>`;
+  if(phase==="concept"){
+    h+=`<div class="concept"><h2>💡 핵심 개념</h2><div class="body">${d.concept}</div>
+        <div class="tbref"><span class="tt">📖 교과서에서 더 찾아보기</span>${REFS[idx]||''}</div></div>
+        <div class="qhint">개념을 확인했다면 <b>문제 풀기 ▶</b> 또는 화면을 왼쪽으로 넘기세요</div>`;
+  }else{
+    h+=`<div class="qhead"><span class="qmark">문제</span><br>${d.q}</div>`;
+    h+=`<div class="opts" id="opts">`;
+    d.opts.forEach((o,i)=>{
+      let cls="opt";
+      if(st.locked){
+        if(i===d.ans)cls+=" correct";
+        else if(st.picked===i)cls+=" wrong";
+        else cls+=" dim";
+      }else if(st.picked===i && i!==d.ans){cls+=" wrong";}
+      h+=`<div class="${cls}" data-i="${i}"><span class="lbl">${LABELS[i]}</span><span>${o}</span></div>`;
+    });
+    h+=`</div>`;
+    h+=`<div class="feedback ${st.locked?'ok show':(st.picked!=null?'bad show':'')}" id="fb">`;
+    if(st.locked){
+      h+=`<div class="fh">✅ 정답입니다!</div>${d.sol}`;
+    }else if(st.picked!=null){
+      h+=`<div class="fh">❌ 다시 생각해 볼까요?</div>${d.sol}<div style="margin-top:8px;font-weight:700;color:#c1373b;">다른 선택지를 눌러 정답을 찾아보세요.</div>`;
+    }
+    h+=`</div>`;
+  }
+  stage.innerHTML=h;
+  if(phase==="question"&&!st.locked){
+    document.querySelectorAll("#opts .opt").forEach(el=>{
+      el.addEventListener("click",()=>pick(parseInt(el.dataset.i)));
+    });
+  }
+  updateChrome();
+}
+
+function pick(i){
+  const d=DATA[idx], st=state[idx];
+  if(st.locked) return;
+  st.picked=i;
+  if(i===d.ans){
+    st.locked=true;
+  }else{
+    if(!st.firstWrong) st.firstWrong=true; // 첫 시도 오답 기록(점수·복습용)
+  }
+  render();
+}
+
+function renderResult(){
+  const total=DATA.length, c=correctCount(), pct=Math.round(c/total*100);
+  const wrong=wrongItems();
+  let h=`<span class="badge">학습 결과</span><div class="result">
+    <div class="ring">정답률</div><div class="big">${pct}%</div>
+    <div class="ring"><b>${c}</b> / ${total} 문항 (첫 시도 기준)</div>`;
+  if(wrong.length===0){
+    h+=`<div class="perfect">🎉 모든 문항을 한 번에 맞혔습니다. 시험 준비 완벽해요!</div>`;
+  }else{
+    h+=`<div style="margin-top:20px;text-align:left;font-weight:800;font-size:15px;color:#c1373b;">🔁 오답 복습 (${wrong.length}문항) — 눌러서 다시 풀기</div>
+        <div class="reviewlist">`;
+    wrong.forEach(o=>{
+      h+=`<div class="reviewitem" data-go="${o.i}"><span class="num">${o.i+1}</span>
+          <span><b>${DATA[o.i].area}</b><br><span style="color:var(--sub);font-size:12.5px;">${SECNAME[DATA[o.i].sec]}</span></span></div>`;
+    });
+    h+=`</div>`;
+  }
+  h+=`</div>`;
+  stage.innerHTML=h;
+  document.querySelectorAll(".reviewitem").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const t=parseInt(el.dataset.go);
+      // 복습: 상태 초기화 후 해당 문항 질문 단계로
+      state[t]={locked:false,firstWrong:false,picked:null};
+      idx=t; phase="question"; render();
+    });
+  });
+}
+
+/* ===== 내비게이션 ===== */
+function goNext(){
+  if(phase==="result"){ // 처음으로
+    idx=0; phase="concept";
+    state.forEach(s=>{s.locked=false;s.firstWrong=false;s.picked=null;});
+    render(); return;
+  }
+  if(phase==="concept"){ phase="question"; render(); return; }
+  // question
+  if(!state[idx].locked) return; // 정답 맞혀야 진행
+  if(idx===DATA.length-1){ phase="result"; render(); }
+  else { idx++; phase="concept"; render(); }
+}
+function goPrev(){
+  if(phase==="result"){ return; }
+  if(phase==="question"){ phase="concept"; render(); return; }
+  if(idx>0){ idx--; phase="question"; if(!state[idx].locked) phase="concept"; render(); }
+}
+
+$("nextBtn").addEventListener("click",goNext);
+$("prevBtn").addEventListener("click",goPrev);
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowRight")goNext();
+  else if(e.key==="ArrowLeft")goPrev();
+  else if(/^[1-5]$/.test(e.key)&&phase==="question"&&!state[idx].locked){
+    const n=parseInt(e.key)-1; if(n<DATA[idx].opts.length)pick(n);
+  }
+});
+/* 스와이프 */
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.changedTouches[0].clientX;ty=e.changedTouches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.4){ dx<0?goNext():goPrev(); }
+},{passive:true});
+
+render();
+</script>
+</body>
+</html>
