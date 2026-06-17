@@ -27,9 +27,14 @@
   .toolbar{margin:12px 0 24px;}
   button{background:var(--main);color:#fff;border:none;border-radius:6px;padding:8px 14px;cursor:pointer;font-size:.9em;margin-right:8px;}
   button:hover{opacity:.85;}
+  .studybtn{display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;
+    background:linear-gradient(135deg,#2c7be5,#1a4d8f);color:#fff;text-decoration:none;font-weight:bold;
+    padding:15px 18px;border-radius:10px;margin:0 0 24px;box-shadow:0 5px 16px rgba(26,77,143,.28);font-size:1.05em;transition:.15s;}
+  .studybtn:hover{transform:translateY(-1px);box-shadow:0 7px 20px rgba(26,77,143,.34);}
+  .studybtn small{display:block;font-weight:500;font-size:.72em;opacity:.9;margin-top:2px;}
   table{border-collapse:collapse;font-size:.92em;}
   td,th{border:1px solid #aaa;padding:4px 10px;}
-  @media print{.toolbar{display:none;} .q{break-inside:avoid;}}
+  @media print{.toolbar,.studybtn{display:none;} .q{break-inside:avoid;}}
 </style>
 </head>
 <body>
@@ -37,6 +42,10 @@
   <h1>고급 화학 정기시험 대비 — 변형 연습문항</h1>
   <div class="sub">제3학년 · 선택형 12 + 서술형 7 + 보강 5 = 총 24문항 · 각 문항의 「풀이 보기」를 눌러 해설을 확인하세요.</div>
 </header>
+
+<a class="studybtn" href="quiz.html">📱 개념 확인 &amp; 문제 풀이 — 학습 페이지로 가기 →
+  <span></span></a>
+<div style="text-align:center;color:#888;font-size:.85em;margin:-16px 0 22px;">개념 카드를 넘기며 핵심 개념을 확인하고, 문제를 풀고, 틀린 문제는 복습할 수 있어요 (태블릿 추천)</div>
 
 <div class="toolbar">
   <button onclick="document.querySelectorAll('details').forEach(d=>d.open=true)">전체 풀이 펼치기</button>
